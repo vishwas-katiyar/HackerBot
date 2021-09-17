@@ -1,0 +1,38 @@
+{
+  "courses": {
+    "PGDM": {
+      "branch": [
+        "Business Analytics",
+        "Digital Marketing",
+        "FinTech",
+        "Banking & Financial Services",
+        "International Business"
+      ]
+    },
+    "BACHELOR OF TECHNOLOGY": {
+      "branch": [
+        "Computer Science & Engineering",
+        "Electronics & Communication Engineering",
+        "Mechanical Engineering",
+        "Civil Engineering",
+        "Electrical Engineering",
+        "Automation and Robotics"
+      ]
+    },
+    "M.TECH CAD/CAM": {
+      "branch": ["Mechanical Engineering"]
+    },
+    "DIPLOMA IN VOCATION": {
+      "branch": [
+        "Software Development Diploma",
+        "Diploma in Vocation and Skill Development"
+      ]
+    },
+    "DIPLOMA IN ENGINEERING": {
+      "branch": ["Civil Engineering DIPLOMA", "Mechanical Engineering DIPLOMA"]
+    },
+    "PMKVY": {
+      "branch": ["http://www.piemr.edu.in/admission-2019/"]
+    }
+  }
+}
