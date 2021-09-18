@@ -1,5 +1,5 @@
 from flask import Flask , render_template,session
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, emit
 import json,re
 from hacker_bot_model import predict_best_match 
 # import poc
@@ -42,18 +42,17 @@ def emit_message(a, select_data):
             intake.remove('branch_importance')
             emit("bot-message",{'message':f"Here are the branches provided by us on program {select_data } {branch_fees[select_data]['branch_importance']} . : ",'isOption' : True,'options': intake})
             session['branch'] = select_data
-            
         elif select_data.lower() == 'yes':
             print(session['is_last_res'])
             if session['is_last_res']: 
-                res =chat00.response(session['last_res'])
+                req,res,ratio =predict_best_match(session['last_res'])
+                print(ratio)
                 session['is_last_res']=False
                 emit("bot-message",{'message':f" {res}",'isOption' : False})
                 return True
             emit("bot-message",{'message':"Please select any program : ",'isOption' : True,'options':list(all_courses)})
         elif select_data.lower() == 'no' or select_data=='No':
             emit("bot-message",{'message':f" If you have any queries please ask.",'isOption' : False})
-            
         else:
             if a['select_data']=='Fees':
                 Fees_session=all_al[session['branch']]['Fees']
@@ -72,22 +71,15 @@ def emit_message(a, select_data):
         emit_message(a,select_data)
     else:
         inp = a['message']
-        res =predict_best_match(inp)
-        # print(res)
-        # print(type(res))
-        whPattern = re.compile(r'(.*)how|what|why|which|whom|\?|Tell me|whose(\.*)', re.IGNORECASE)
-        whWord = whPattern.search(str(res))
-        if whWord :
-            session['last_res']=res
-            session['is_last_res']=True
+        req,res,ratio =predict_best_match(inp)
+        print(ratio)
+        if req:
+            emit("bot-message",{'message':f'''{res}''','isOption' : False})
+        else:
+            session['is_last_res']=True;session['last_res']=res
             emit("bot-message",{'message':f"Sorry, I didn't get you. ",'isOption' : False})
             emit("bot-message",{'message':f'Did you mean, {str(res)}','isOption' : True,'options':['Yes','No']})
-            return True
-        if res ==None:
-            emit("bot-message",{'message':"So, how may I help you today ?",'isOption' : False,'options':list(all_courses)})
-        else:
-
-            emit("bot-message",{'message':f"{res}",'isOption' : False})
+            # emit("bot-message",{'message':"Sorry , how may I help you today ?",'isOption' : False,'options':list(all_courses)})
     return True
 
 @socketio.on('client-message')

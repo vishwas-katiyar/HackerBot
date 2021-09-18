@@ -1,8 +1,9 @@
+from difflib import SequenceMatcher
 import pandas as pd
 import requests
 
 try:
-    df=pd.read_json('result.json', lines=True, orient='records')
+    df=pd.read_json('indents.json')
 except:
     url = 'https://github.com/vishwas-katiyar/HackerBot/raw/main/indents.json'
     r = requests.get(url, allow_redirects=True)
@@ -17,11 +18,10 @@ except:
     open('indents.json', 'wb').write(r.content)
 df=pd.read_json('indents.json')
 get_responses=df['Answers'];input_queries=df['Questions']
-from difflib import SequenceMatcher 
 def get_best_matches(ques,a):
     return SequenceMatcher(None,ques,a).ratio() 
 def predict_best_match(input_search):
     df['Ratio']=input_queries.apply(get_best_matches,a=input_search)
     max_threshold_value=df['Ratio'].argmax()
     threshold=df['Ratio'][max_threshold_value]
-    return get_responses[max_threshold_value] if threshold > 0.5 else False
+    return (True, get_responses[max_threshold_value],df['Ratio'][max_threshold_value]) if threshold > 0.5 else (False,input_queries[max_threshold_value],df['Ratio'][max_threshold_value])
