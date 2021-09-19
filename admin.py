@@ -23,7 +23,7 @@ all_courses=list(course_branch['courses'].keys())
 
 @app.route('/')
 def index():
-    return 200,{'success':True}
+    return {'success':True},200
     # return render_template('index.html')
 
 @socketio.on('start')
