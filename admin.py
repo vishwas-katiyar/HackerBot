@@ -1,6 +1,6 @@
-from flask import Flask , render_template,session
+from flask import Flask ,session
 from flask_socketio import SocketIO, emit
-import json,re
+import json
 from hacker_bot_model import predict_best_match 
 # import poc
 
@@ -23,13 +23,14 @@ all_courses=list(course_branch['courses'].keys())
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return 200,{'success':True}
+    # return render_template('index.html')
 
 @socketio.on('start')
 def handleMessage(msg):
     session['is_last_res']=False
 
-    emit("bot-message",{'message':"Hii! I am a chatbot developed by Deja Vu Hackathon 1.0 "})
+    emit("bot-message",{'message':"Hii! I am a chatbot developed by Deja Vu in Hackathon 1.0 "})
     emit("bot-message",{'message':"Do you want to know about Admissions ?",'isOption' : True,'options':['Yes','No']})
 
 def emit_message(a, select_data):
@@ -43,7 +44,7 @@ def emit_message(a, select_data):
             emit("bot-message",{'message':f"Here are the branches provided by us on program {select_data } {branch_fees[select_data]['branch_importance']} . : ",'isOption' : True,'options': intake})
             session['branch'] = select_data
         elif select_data.lower() == 'yes':
-            print(session['is_last_res'])
+            # print(session['is_last_res'])
             if session['is_last_res']: 
                 req,res,ratio =predict_best_match(session['last_res'])
                 print(ratio)
@@ -69,6 +70,9 @@ def emit_message(a, select_data):
         a['select']=True
         a['message']=select_data
         emit_message(a,select_data)
+    elif 'program' in a['message'].lower().split() :
+        emit("bot-message",{'message':"Please select any program : ",'isOption' : True,'options':list(all_courses)})
+        # emit("bot-message",{'message':f"Here are the branches provided by us on program {select_data} .", 'isOption' : True,'options': course_branch['courses'][select_data]['branch']})
     else:
         inp = a['message']
         req,res,ratio =predict_best_match(inp)
