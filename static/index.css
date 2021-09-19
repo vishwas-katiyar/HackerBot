@@ -37,15 +37,18 @@ body {
   border-radius: 20px;
 }
 
-.myvideo img {
-  border-radius: 20px;
+.icons {
+  width: 9%;
+  display: flex;
+  justify-content: space-between;
 }
 
-.dot {
-  font-weight: bold;
+#voice {
+  cursor: pointer;
 }
 
 .form-control {
+  height: unset;
   border-radius: 12px;
   border: 1px solid #f0f0f0;
   font-size: 0.9rem;
@@ -57,6 +60,32 @@ body {
 
 .form-control::placeholder {
   color: #c4c4c4;
+}
+
+#mic-text {
+  background: none;
+  border-radius: 0px 12px 12px 0px;
+  border: 1px solid #f0f0f0;
+  border-left: 0;
+  cursor: pointer;
+}
+
+@keyframes bg-pulse {
+  0% {
+    background-color: #fff;
+  }
+
+  50% {
+    background-color: #d1d1d1;
+  }
+
+  100% {
+    backgrouond-color: #fff;
+  }
+}
+
+#mic-text.speaking {
+  animation: bg-pulse 1.5s alternate ease-in-out infinite;
 }
 
 #message-container::-webkit-scrollbar {

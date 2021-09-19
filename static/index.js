@@ -1,38 +1,112 @@
-// $(document).ready(function () {
-  let socket = io();
-  socket.on("connect", function () {
-    socket.emit("start", { data: "I'm connected!" });
-  });
-  socket.on("bot-message", function (data) {
-    console.log(data);
-    addData(createBotMessage(data.message));
+let listening = false;
+let speechFlag = true;
+window.addEventListener("DOMContentLoaded", () => {
+  const button = $("#mic-text");
+  const result = $("#send-input");
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (typeof SpeechRecognition === "undefined") {
+    button.attr("disabled", true);
+    alert("Your browser doesn't support Speech Recognition. Sorry.");
+  } else {
+    listening = false;
+    const recognition = new SpeechRecognition();
+    const start = () => {
+      recognition.start();
+      button.addClass("speaking");
+    };
+    const stop = () => {
+      recognition.stop();
+      button.removeClass("speaking");
+    };
+    const onResult = (event) => {
+      result.val("");
+      for (const res of event.results) {
+        const text = res[0].transcript;
+        result.val(`${result.val()}${text}`);
+      }
+    };
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.addEventListener("result", onResult);
+    button.on("click", () => {
+      listening ? stop() : start();
+
+      listening = !listening;
+    });
+  }
+});
+
+$("#voice").click(function () {
+  if (speechFlag) {
+    $("#voice").removeClass("fa-volume-up");
+    $("#voice").addClass("fa-volume-mute");
+    speechFlag = !speechFlag;
+  } else {
+    $("#voice").removeClass("fa-volume-mute");
+    $("#voice").addClass("fa-volume-up");
+    speechFlag = !speechFlag;
+  }
+});
+
+let socket = io("https://vishwashackerbot.herokuapp.com/");
+// let socket = io("http://127.0.0.1:5000/");
+socket.on("connect", function () {
+  socket.emit("start", { data: "I'm connected!" });
+});
+
+socket.on("bot-message", function (data) {
+  addData(createBotMessage(data.message));
+  if (data.isOption) {
+    addData(createButtons(data.options));
+  }
+  if (data.docs) {
+    addData(createLink());
+  }
+  let objDiv = document.getElementById("message-container");
+  objDiv.scrollTop = objDiv.scrollHeight;
+  let speech;
+  if (speechFlag) {
+    speech = new SpeechSynthesisUtterance();
+    speech.lang = "en-IN";
+    speech.text = data.message;
+    speech.volume = 1;
+    speech.rate = 1;
+    speech.pitch = 1;
     if (data.isOption) {
-      addData(createButtons(data.options));
+      if (data.options.length === 2) {
+        speech.text += `. Please select ${data.options[0]} or ${data.options[1]}`
+      } else {
+        let options = "";
+        data.options.forEach((option) => {
+          options += `${option}, `;
+        });
+        speech.text += ` Please select an option from ${options}`
+      }
     }
-    if (data.docs) {
-      addData(createLink());
+    window.speechSynthesis.speak(speech);
+  }
+});
+
+$("#send").click(function () {
+  if ($("#send-input").val()) {
+    addData(createUserMessage($("#send-input").val()));
+    socket.emit("client-message", {
+      select: false,
+      message: $("#send-input").val(),
+      select_data: "",
+    });
+    $("#send-input").val("");
+    if (listening) {
+      $("#mic-text").trigger("click");
     }
     let objDiv = document.getElementById("message-container");
     objDiv.scrollTop = objDiv.scrollHeight;
-  });
-
-  $("#send").click(function () {
-    if ($("#send-input").val()) {
-      addData(createUserMessage($("#send-input").val()));
-      socket.emit("client-message", {
-        select: false,
-        message: $("#send-input").val(),
-        select_data: "",
-      });
-      $("#send-input").val("");
-      let objDiv = document.getElementById("message-container");
-    objDiv.scrollTop = objDiv.scrollHeight;
-    }
-  });
-// });
+  }
+});
 
 $("#send-input").on("keyup", function (e) {
-  console.log(e);
   if (e.keyCode === 13) {
     e.preventDefault();
     $("#send").trigger("click");
@@ -40,11 +114,6 @@ $("#send-input").on("keyup", function (e) {
 });
 
 function optionButtonClick(e, message) {
-  console.log("message", {
-    select: true,
-    message: "",
-    select_data: message,
-  });
   addData(createUserMessage(message));
   $("button.option-btn").attr("disabled", true);
   socket.emit("client-message", {
@@ -78,7 +147,7 @@ function createLink() {
 
 function createBotMessage(message) {
   return `<div class="d-flex justify-content-start flex-row py-3">
-  <img src="/static/chatbot.png" width="25" height="25" />
+  <img src="./static/chatbot.png" width="25" height="25" />
   <div class="chat ml-2 p-3">${message}</div>
 </div>`;
 }
@@ -88,7 +157,7 @@ function createUserMessage(message) {
   <div class="bg-white mr-2 p-3">
     <span class="text-muted">${message}</span>
   </div>
-  <img src="/static/user.png" width="30" height="30" />
+  <img src="./static/user.png" width="30" height="30" />
 </div>`;
 }
 
