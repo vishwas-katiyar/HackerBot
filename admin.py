@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app,cors_allowed_origins='*')
 SESSION_TYPE = 'redis'
-# CORS(socketio)
+CORS(app)
 
 f = open('course_branch.json',encoding="utf8")
 course_branch = json.load(f)
