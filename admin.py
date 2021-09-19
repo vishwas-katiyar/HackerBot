@@ -6,10 +6,11 @@ from flask_cors import CORS
 # import poc
 
 app = Flask(__name__)
-CORS(app)
+# SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app,cors_allowed_origins='*')
 SESSION_TYPE = 'redis'
+# CORS(socketio)
 
 f = open('course_branch.json',encoding="utf8")
 course_branch = json.load(f)
