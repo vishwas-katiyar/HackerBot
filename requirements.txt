@@ -34,4 +34,4 @@ urllib3==1.26.6
 waitress==2.0.0
 Werkzeug==2.0.1
 wsproto==1.0.0
-flask_socketio
+Flask-Sockets
