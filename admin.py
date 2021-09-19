@@ -2,9 +2,11 @@ from flask import Flask ,session
 from flask_socketio import SocketIO, emit
 import json
 from hacker_bot_model import predict_best_match 
+from flask_cors import CORS
 # import poc
 
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app,cors_allowed_origins='*')
 SESSION_TYPE = 'redis'
@@ -21,7 +23,7 @@ all_courses=list(course_branch['courses'].keys())
 
 
 
-@app.route('/')
+@app.route('/test')
 def index():
     return {'success':True},200
     # return render_template('index.html')
