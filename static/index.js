@@ -25,6 +25,8 @@ window.addEventListener("DOMContentLoaded", () => {
       for (const res of event.results) {
         const text = res[0].transcript;
         result.val(`${result.val()}${text}`);
+        let objDiv = document.getElementById("send-input");
+        objDiv.scrollTop = objDiv.scrollHeight;
       }
     };
     recognition.continuous = true;
@@ -50,8 +52,16 @@ $("#voice").click(function () {
   }
 });
 
-let socket = io("https://vishwashackerbot.herokuapp.com/");
-// let socket = io("http://127.0.0.1:5000/");
+let socket = io("https://vishwashackerbot.herokuapp.com/", {
+  transports: ["websocket"],
+reconnection:false
+ });
+$("#reload").click(function () {
+  socket.disconnect();
+  $("#message-container").html("");
+  window.speechSynthesis.cancel();
+  socket.connect();
+});
 socket.on("connect", function () {
   socket.emit("start", { data: "I'm connected!" });
 });
@@ -91,6 +101,7 @@ socket.on("bot-message", function (data) {
 
 $("#send").click(function () {
   if ($("#send-input").val()) {
+    window.speechSynthesis.cancel();
     addData(createUserMessage($("#send-input").val()));
     socket.emit("client-message", {
       select: false,
@@ -114,6 +125,7 @@ $("#send-input").on("keyup", function (e) {
 });
 
 function optionButtonClick(e, message) {
+  window.speechSynthesis.cancel();
   addData(createUserMessage(message));
   $("button.option-btn").attr("disabled", true);
   socket.emit("client-message", {
