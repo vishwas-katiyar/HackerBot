@@ -44,6 +44,7 @@ $("#voice").click(function () {
   if (speechFlag) {
     $("#voice").removeClass("fa-volume-up");
     $("#voice").addClass("fa-volume-mute");
+    window.speechSynthesis.cancel();
     speechFlag = !speechFlag;
   } else {
     $("#voice").removeClass("fa-volume-mute");
@@ -54,14 +55,17 @@ $("#voice").click(function () {
 
 let socket = io("https://vishwashackerbot.herokuapp.com/", {
   transports: ["websocket"],
-reconnection:false
- });
+  reconnection: false,
+});
+// let socket = io("http://127.0.0.1:5000/");
+
 $("#reload").click(function () {
   socket.disconnect();
   $("#message-container").html("");
   window.speechSynthesis.cancel();
   socket.connect();
 });
+
 socket.on("connect", function () {
   socket.emit("start", { data: "I'm connected!" });
 });
@@ -86,13 +90,13 @@ socket.on("bot-message", function (data) {
     speech.pitch = 1;
     if (data.isOption) {
       if (data.options.length === 2) {
-        speech.text += `. Please select ${data.options[0]} or ${data.options[1]}`
+        speech.text += `. Please select ${data.options[0]} or ${data.options[1]}`;
       } else {
         let options = "";
         data.options.forEach((option) => {
           options += `${option}, `;
         });
-        speech.text += ` Please select an option from ${options}`
+        speech.text += ` Please select an option from ${options}`;
       }
     }
     window.speechSynthesis.speak(speech);
@@ -100,7 +104,7 @@ socket.on("bot-message", function (data) {
 });
 
 $("#send").click(function () {
-  if ($("#send-input").val()) {
+  if ($("#send-input").val().trim()) {
     window.speechSynthesis.cancel();
     addData(createUserMessage($("#send-input").val()));
     socket.emit("client-message", {
@@ -118,7 +122,7 @@ $("#send").click(function () {
 });
 
 $("#send-input").on("keyup", function (e) {
-  if (e.keyCode === 13) {
+  if (e.keyCode === 13 && !e.shiftKey) {
     e.preventDefault();
     $("#send").trigger("click");
   }
