@@ -63,7 +63,9 @@ $("#reload").click(function () {
   socket.disconnect();
   $("#message-container").html("");
   window.speechSynthesis.cancel();
-  socket.connect();
+  setTimeout(function () {
+    socket.connect();
+  }, 10);
 });
 
 socket.on("connect", function () {
