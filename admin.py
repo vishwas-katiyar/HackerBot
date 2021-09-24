@@ -99,5 +99,5 @@ def abc(msg):
     emit_message(a,select_data)
     
 if __name__ == '__main__':
-    app.run()
+    # app.run()
     socketio.run(app)
