@@ -1,4 +1,4 @@
-from flask import Flask ,session
+from flask import Flask ,session,render_template
 from flask_socketio import SocketIO, emit
 import json
 from hacker_bot_model import predict_best_match 
@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 # SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'mysecret'
-socketio = SocketIO(app,cors_allowed_origins='*')
+socketio = SocketIO(app,cors_allowed_origins='*',async_mode='threading')
 SESSION_TYPE = 'redis'
 CORS(app)
 
@@ -26,8 +26,8 @@ all_courses=list(course_branch['courses'].keys())
 
 @app.route('/test')
 def index():
-    return {'success':True},200
-    # return render_template('index.html')
+    # return {'success':True},200
+    return render_template('index.html')
 
 @socketio.on('start')
 def handleMessage(msg):
@@ -79,7 +79,7 @@ def emit_message(a, select_data):
     else:
         inp = a['message']
         req,res,ratio =predict_best_match(inp)
-        print(ratio)
+        # print(ratio)
         if req:
             emit("bot-message",{'message':f'''{res}''','isOption' : False})
         else:
@@ -99,4 +99,5 @@ def abc(msg):
     emit_message(a,select_data)
     
 if __name__ == '__main__':
-	socketio.run(app)
+    app.run()
+    socketio.run(app)
