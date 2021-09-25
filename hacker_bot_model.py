@@ -3,6 +3,11 @@ import pandas as pd
 import requests
 from fuzzywuzzy import fuzz ,process
 global df
+# from difflib import SequenceMatcher
+
+# def similar(a, b):
+#     return SequenceMatcher(None, a, b).ratio()
+
 try:
     df=pd.read_json('indents.json')
 except:

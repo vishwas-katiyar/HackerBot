@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 # SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'mysecret'
-socketio = SocketIO(app,cors_allowed_origins='*',async_mode='threading')
+socketio = SocketIO(app,cors_allowed_origins='*')
 SESSION_TYPE = 'redis'
 CORS(app)
 
